@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <script>
+        let videoStream;
+
+        // Start the webcam
+        function startWebcam() {
+            const video = document.getElementById('video');
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then((stream) => {
+                    videoStream = stream;
+                    video.srcObject = stream;
+                })
+                .catch((err) => {
+                    alert('Error accessing webcam: ' + err.message);
+                });
+        }
+
+        // Capture the image from the webcam
+        function captureImage() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Convert the canvas image to a data URL
+            const imageData = canvas.toDataURL('image/png');
+            document.getElementById('capturedImage').value = imageData;
+
+            // Stop the webcam stream
+            videoStream.getTracks().forEach(track => track.stop());
+        }
+    </script>
+</head>
+<body onload="startWebcam()">
+    <h1>Login</h1>
+    <form action="/login" method="post">
+        <div>
+            <video id="video" autoplay width="320" height="240"></video>
+            <button type="button" onclick="captureImage()">Capture Image</button>
+        </div>
+
+        <canvas id="canvas" width="320" height="240" style="display: none;"></canvas>
+        <input type="hidden" name="image" id="capturedImage">
+
+        <button type="submit">Login</button>
+    </form>
+    <a href="/index">Back to Home</a>
+</body>
+</html>

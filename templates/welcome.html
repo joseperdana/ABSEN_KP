@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Welcome</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          animation: {
+            'fade-in': 'fadeIn 1s ease-out forwards',
+            'bounce': 'bounce 1s infinite',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-blue-500 flex items-center justify-center p-4 relative">
+
+  <!-- Animated background elements -->
+  <div class="absolute inset-0 overflow-hidden">
+    <div class="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-white/10 animate-pulse"></div>
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 rounded-full bg-white/5 animate-pulse delay-1000"></div>
+    <div class="absolute top-1/4 left-1/4 w-32 h-32 rounded-full bg-white/5 animate-pulse delay-500"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-24 h-24 rounded-full bg-white/5 animate-pulse delay-700"></div>
+  </div>
+
+  <!-- Main Card -->
+  <div class="relative z-10 bg-white/10 backdrop-blur-xl p-12 rounded-3xl shadow-2xl border border-white/20 max-w-2xl w-full text-center text-white">
+    <div class="mb-8">
+      <h1 class="text-6xl md:text-7xl font-bold mb-4 animate-fade-in">
+        <span class="bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent animate-pulse">
+          Welcome Home
+        </span>
+      </h1>
+      <div class="text-3xl md:text-4xl font-semibold text-white/90 mb-6 animate-fade-in delay-300">
+        <span class="bg-gradient-to-r from-blue-100 to-white bg-clip-text text-transparent">
+          {{ nickname }}!
+        </span>
+      </div>
+      <div class="flex items-center justify-center mb-6">
+        <div class="bg-gradient-to-r from-white/20 to-white/10 p-4 rounded-full backdrop-blur-sm animate-bounce">
+          ✅
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-10">
+      <p class="text-xl text-white/80 font-medium animate-fade-in delay-500">
+        Selamat bersekutu di KP
+      </p>
+      <div class="mt-4 w-24 h-1 bg-gradient-to-r from-transparent via-white/50 to-transparent mx-auto rounded-full animate-fade-in delay-700"></div>
+    </div>
+
+    <div class="animate-fade-in delay-1000">
+      <button
+        onclick="window.location.href='/'"
+        class="bg-gradient-to-r from-white to-white/90 hover:from-white/90 hover:to-white/80 text-blue-700 font-semibold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex items-center justify-center space-x-3 mx-auto backdrop-blur-sm"
+      >
+        <span>🏠</span>
+        <span>Welcome New Person!</span>
+      </button>
+    </div>
+
+    <!-- Decorative borders -->
+    <div class="absolute top-8 left-8 w-6 h-6 border-t-2 border-l-2 border-white/40 rounded-tl-lg animate-fade-in delay-200"></div>
+    <div class="absolute top-8 right-8 w-6 h-6 border-t-2 border-r-2 border-white/40 rounded-tr-lg animate-fade-in delay-400"></div>
+    <div class="absolute bottom-8 left-8 w-6 h-6 border-b-2 border-l-2 border-white/40 rounded-bl-lg animate-fade-in delay-600"></div>
+    <div class="absolute bottom-8 right-8 w-6 h-6 border-b-2 border-r-2 border-white/40 rounded-br-lg animate-fade-in delay-800"></div>
+  </div>
+
+</body>
+</html>

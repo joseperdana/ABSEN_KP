@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              animation: {
+                'fade-in': 'fadeIn 1s ease-out forwards',
+                'bounce': 'bounce 1s infinite',
+              },
+              keyframes: {
+                fadeIn: {
+                  '0%': { opacity: '0' },
+                  '100%': { opacity: '1' }
+                }
+              }
+            }
+          }
+        }
+      </script>
+    <script>
+        let video;
+        let registrationController;
+
+        function startWebcam() {
+            const loginButton = document.getElementById('register-button');
+            video = document.getElementById('webcam');
+            if (!video || !loginButton) {
+              console.error("Elemen video dengan id 'webcam' tidak ditemukan.");
+              return;
+            }
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then((stream) => {
+                    video.srcObject = stream;
+                    video.play();
+
+                    loginButton.disabled = false; // Hapus status disabled
+                    // Kembalikan style dan teks tombol ke keadaan normal
+                    loginButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                    loginButton.classList.add('bg-white', 'text-blue-700', 'hover:scale-105');
+                    loginButton.textContent = 'Register ✍';
+
+                })
+                .catch((err) => {
+                    console.error('Error accessing webcam:', err);
+                    loginButton.textContent = 'Kamera Gagal';
+                    alert('Unable to access webcam. Please check your permissions.');
+                });
+        }
+
+        // Fungsi untuk membatalkan request
+        function cancelRequest() {
+          if (registrationController) {
+              registrationController.abort();
+              console.log("Fetch request cancelled.");
+          }
+        }
+
+        async function registerUser() {
+            const nickname = document.getElementById('nickname').value;
+            if (!nickname) {
+                alert('Please enter a nickname.');
+                return;
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageData = canvas.toDataURL('image/jpeg'); // Convert frame to base64
+
+            const response = await fetch('/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nickname: nickname, image: imageData })
+            });
+
+             registrationController = new AbortController(); // Buat controller baru
+            const signal = registrationController.signal;
+
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nickname: nickname, image: imageData }),
+                    signal: signal // Kaitkan sinyal dengan fetch
+                });
+
+                const result = await response.json();
+                if (result.status === 'success') {
+                    alert('Registrasi berhasil!');
+                    window.location.href = '/'; // Redirect ke login
+                } else {
+                    alert(result.message); // Akan menampilkan "Nickname sudah ada" jika terjadi
+                }
+            } catch (err) {
+                if (err.name === 'AbortError') {
+                    // Jangan tampilkan alert jika user yang membatalkan
+                    console.log('Fetch aborted by user.');
+                } else {
+                    console.error("Error during fetch:", err);
+                    alert("Terjadi kesalahan saat registrasi.");
+                }
+            } finally {
+                loadingModal.classList.add("hidden"); // Selalu sembunyikan pop-up di akhir
+            }
+        }
+
+        window.onload = startWebcam;
+    </script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-blue-500 flex items-center justify-center p-4 relative">
+
+    <!-- Background blobs -->
+    <div class="absolute inset-0 overflow-hidden">
+      <div class="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-white/10 animate-pulse"></div>
+      <div class="absolute -bottom-40 -left-40 w-80 h-80 rounded-full bg-white/5 animate-pulse delay-1000"></div>
+      <div class="absolute top-1/4 left-1/4 w-32 h-32 rounded-full bg-white/5 animate-pulse delay-500"></div>
+      <div class="absolute bottom-1/4 right-1/4 w-24 h-24 rounded-full bg-white/5 animate-pulse delay-700"></div>
+    </div>
+  
+    <!-- Main Card -->
+    <div class="relative z-10 bg-white/10 backdrop-blur-xl p-10 rounded-3xl shadow-2xl border border-white/20 max-w-xl w-full text-white text-center space-y-8">
+      <h1 class="text-4xl md:text-5xl font-bold animate-fade-in">
+        Register
+      </h1>
+  
+      <!-- Nickname Input -->
+      <div class="space-y-2 animate-fade-in delay-200">
+        <label for="nickname" class="block text-lg font-medium">Enter your nickname:</label>
+        <input
+          type="text"
+          id="nickname"
+          placeholder="Nickname"
+          class="w-full px-4 py-3 rounded-xl bg-white/20 border border-white/30 placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent text-white backdrop-blur-sm"
+        />
+      </div>
+  
+      <!-- Webcam Preview -->
+      <div class="relative aspect-[16/9] rounded-xl overflow-hidden border-2 border-white/30 bg-black">
+        <video id="webcam" autoplay muted class="absolute inset-0 w-full h-full object-contain"></video>
+      </div>
+  
+      <!-- Action Buttons -->
+      <div class="flex flex-col md:flex-row items-center justify-center gap-4 animate-fade-in delay-500">
+        <button id="register-button" onclick="registerUser()" disabled class="bg-gray-400 text-white font-semibold py-3 px-6 rounded-xl transition-all shadow-lg cursor-not-allowed">
+          Tunggu, kamera sedang disiapkan...
+      </button>
+        <button
+          onclick="window.location.href='/'"
+          class="bg-white/10 text-white border border-white/30 font-medium py-3 px-6 rounded-xl hover:bg-white/20 transition duration-300"
+        >
+          ⬅ Back to Login
+        </button>
+      </div>
+    </div>
+</body>
+</html>
